@@ -154,7 +154,7 @@ button {
   color: #9991c5;
   padding: 11px 14px;
   border-radius: 8px;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .empty-state {
@@ -269,21 +269,15 @@ button {
 }
 
 .agent-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
   padding: 8px 12px;
   border-radius: 20px;
   background: #f0f2f6;
   color: #69758b;
   font-size: 12px;
   white-space: nowrap;
-}
-
-.agent-status .status-dot {
-  width: 7px;
-  height: 7px;
-  background: currentColor;
+  border: none;
+  font: inherit;
+  cursor: pointer;
 }
 
 .agent-status.available {

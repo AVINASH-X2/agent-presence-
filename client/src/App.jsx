@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { io } from "socket.io-client";
 
-const API_URL = "http://localhost:5000/api/agents";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${BASE_URL}/api/agents`;
 
 function App() {
   const [agents, setAgents] = useState([]);
@@ -121,6 +122,7 @@ function App() {
       });
 
       setFormSuccess("Agent added successfully!");
+      setTimeout(() => setFormSuccess(""), 3000);
       setShowForm(false);
     } catch (err) {
       setFormError(err.message);
@@ -131,28 +133,20 @@ function App() {
 
   const handleStatusChange = async (agentId, newStatus) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/agents/${agentId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
+      const response = await fetch(`${API_URL}/${agentId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
       const result = await response.json();
 
       if (!response.ok) {
         throw new Error(result.message || "Failed to update status");
       }
-
-      setAgents((currentAgents) =>
-        currentAgents.map((agent) =>
-          agent._id === agentId ? result.data : agent
-        )
-      );
+      // State update is handled by the agentStatusUpdated socket event
     } catch (error) {
       console.error("Status update failed:", error);
       setError(error.message || "Failed to update agent status");
@@ -160,7 +154,7 @@ function App() {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io(BASE_URL);
 
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
